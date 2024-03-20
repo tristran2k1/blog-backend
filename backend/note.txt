@@ -1,0 +1,28 @@
+﻿log: serilog.AspNetCore
+
+auth: 
+	UserIdentity:
+		-- Microsoft.AspNetCore.Identity.EntityFrameworkCore
+	JWT:
+		-- Microsoft.AspNetCore.Authentication.JwtBearer
+
+
+
+Sql-server:
+	Microsoft.EntityFrameworkCore.SqlServer
+
+Swagger:
+	Swashbuckle.AspNetCore
+
+common:
+	Microsoft.EntityFrameworkCore
+	Microsoft.EntityFrameworkCore.Design
+
+
+---------------- generation
+
+Package Manager console: 
+	
+	migration db:
+		dotnet ef migrations add InitialCreate
+		dotnet ef database update

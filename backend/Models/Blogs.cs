@@ -6,7 +6,7 @@ namespace backend.Models
     [Table("Blogs")]
     public class Blogs
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string title { get; set; } = string.Empty;
         public string content { get; set; } = string.Empty;
         public DateTime created_at { get; set; } = DateTime.Now;

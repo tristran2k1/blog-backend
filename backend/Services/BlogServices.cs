@@ -4,6 +4,7 @@ using backend.Interfaces;
 using backend.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace backend.Services
@@ -18,7 +19,7 @@ namespace backend.Services
             _context = context;
         }
 
-        public async Task<Blogs?> GetBlogAsync(string id)
+        public async Task<Blogs?> GetBlogByIdAsync(int id)
         {
             return await _context.Blogs.FirstOrDefaultAsync(b => b.Id == id);
         }
@@ -33,19 +34,20 @@ namespace backend.Services
 
         }
 
-        public async Task<Blogs?> updateOrCreateBlogAsync(UpdateBlogDto data, string owner_id)
+        public async Task<Blogs?> UpdateOrCreateBlogAsync(UpdateBlogDto data, string owner_id)
         {
 
-            if (string.IsNullOrEmpty(data.id))
+            if (data?.id == null)
             {
                 var newBlog = new Blogs
                 {
-                    title = data.title ?? string.Empty,
-                    content = data.content ?? string.Empty,
+                    title = data?.title ?? string.Empty,
+                    content = data?.content ?? string.Empty,
                     created_at = DateTime.UtcNow,
                     updated_at = DateTime.UtcNow,
                     owner_id = owner_id
                 };
+                
                 await _context.Blogs.AddAsync(newBlog);
                 await _context.SaveChangesAsync();
 
@@ -66,7 +68,7 @@ namespace backend.Services
             return oldBlog;
         }
 
-        public async Task<Blogs?> deleteBlog(string id, string owner_id)
+        public async Task<Blogs?> DeleteBlogAsync(int id, string owner_id)
         {
             var blog = await _context.Blogs.FirstOrDefaultAsync(b => b.Id == id && b.owner_id == owner_id);
             if (blog == null)
@@ -76,7 +78,6 @@ namespace backend.Services
             return blog;
         }
 
-
-
+       
     }
 }

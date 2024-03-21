@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -162,7 +162,8 @@ namespace backend.Migrations
                 name: "Blogs",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -185,8 +186,8 @@ namespace backend.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "6a84c856-f6ff-4719-a088-bee2c258a424", null, "Admin", "ADMIN" },
-                    { "9d9281a3-eb6a-4c92-a067-0525fb146322", null, "User", "USER" }
+                    { "b103fbe9-7735-4b0e-bd93-9d3e7b9b5402", null, "Admin", "ADMIN" },
+                    { "ee0fd2f6-4ab6-4295-b033-2988a9392627", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(

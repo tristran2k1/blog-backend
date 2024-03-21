@@ -51,13 +51,13 @@ namespace backend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "8480428e-e6ca-42dc-ad87-8cabb25aacce",
+                            Id = "b103fbe9-7735-4b0e-bd93-9d3e7b9b5402",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "ede348ca-b26e-4094-b2fc-7bbc26f5a671",
+                            Id = "ee0fd2f6-4ab6-4295-b033-2988a9392627",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -171,8 +171,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Blogs", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("content")
                         .IsRequired()

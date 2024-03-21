@@ -5,8 +5,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Azure.Core;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 
 namespace api.Service
@@ -48,6 +50,13 @@ namespace api.Service
             return tokenHandler.WriteToken(token);
         }
 
+        public string GetUsernamefromHeaderAuth(StringValues headerAuth)
+        {
+            string token = ExtractToken(headerAuth.First() ?? "");
+            var jwtSecurity = ConvertJwtStringToJwtSecurityToken(token);
+            return GetUsernameFromJwt(jwtSecurity);
+        }
+
         public JwtSecurityToken ConvertJwtStringToJwtSecurityToken(string? jwt)
         {
             var handler = new JwtSecurityTokenHandler();
@@ -65,6 +74,13 @@ namespace api.Service
 
             return givenName;
         }
+
+        public string ExtractToken(string headerAuth)
+        {
+            var jwtToken = headerAuth.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[1];
+            return jwtToken;
+        }
+
 
     }
 }

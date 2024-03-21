@@ -97,6 +97,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddScoped<IAccountRepository, AccountServices>();
+builder.Services.AddScoped<IBlogRepository, BlogServices>();
 builder.Services.AddScoped<IToken, TokenService>();
 
 builder.Host.UseSerilog();

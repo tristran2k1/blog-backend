@@ -162,8 +162,7 @@ namespace backend.Migrations
                 name: "Blogs",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -186,8 +185,8 @@ namespace backend.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "e8d8efbf-7d0c-4743-ada7-357f94914442", null, "Admin", "ADMIN" },
-                    { "f8c9e9f6-69bb-4be8-a84a-2811ab9d0c65", null, "User", "USER" }
+                    { "6a84c856-f6ff-4719-a088-bee2c258a424", null, "Admin", "ADMIN" },
+                    { "9d9281a3-eb6a-4c92-a067-0525fb146322", null, "User", "USER" }
                 });
 
             migrationBuilder.CreateIndex(

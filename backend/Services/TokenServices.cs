@@ -21,6 +21,7 @@ namespace api.Service
             _config = config;
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"] ?? ""));
         }
+
         public string CreateToken(Users user)
         {
             var claims = new List<Claim>
@@ -47,7 +48,7 @@ namespace api.Service
             return tokenHandler.WriteToken(token);
         }
 
-        public static JwtSecurityToken ConvertJwtStringToJwtSecurityToken(string? jwt)
+        public JwtSecurityToken ConvertJwtStringToJwtSecurityToken(string? jwt)
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(jwt);
@@ -55,7 +56,7 @@ namespace api.Service
             return token;
         }
 
-        public static string GetUsernameFromJwt(JwtSecurityToken token)
+        public string GetUsernameFromJwt(JwtSecurityToken token)
         {
             var keyId = token.Header.Kid;
             var audience = token.Audiences.ToList();

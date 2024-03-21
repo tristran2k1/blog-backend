@@ -12,8 +12,8 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240320042336_initial")]
-    partial class initial
+    [Migration("20240321101446_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,13 +54,13 @@ namespace backend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e8d8efbf-7d0c-4743-ada7-357f94914442",
+                            Id = "8480428e-e6ca-42dc-ad87-8cabb25aacce",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "f8c9e9f6-69bb-4be8-a84a-2811ab9d0c65",
+                            Id = "ede348ca-b26e-4094-b2fc-7bbc26f5a671",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -174,11 +174,8 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Blogs", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("content")
                         .IsRequired()

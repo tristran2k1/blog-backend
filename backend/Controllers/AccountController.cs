@@ -5,7 +5,9 @@ using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace backend.Controllers
 {
@@ -13,17 +15,12 @@ namespace backend.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<Users> _userManager;
         private readonly IToken _tokenServices;
-        private readonly SignInManager<Users> _signInManager;
         private readonly IAccountRepository _accountServices;
 
-        public AccountController(UserManager<Users> userManager, IToken tokenServices, 
-            SignInManager<Users> signInManager, IAccountRepository accountServices)
+        public AccountController(IToken tokenServices, IAccountRepository accountServices)
         {
-            _userManager = userManager;
             _tokenServices = tokenServices;
-            _signInManager = signInManager;
             _accountServices = accountServices;
         }
 
@@ -31,46 +28,23 @@ namespace backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var newUser = new Users
+                var res = await _accountServices.CreateNewUserAsync(registerDto);
+                return Ok(new AuthenResDto
                 {
-                    UserName = registerDto.Username,
-                    Email = registerDto.Email
-                };
-
-                var createdUser = await _userManager.CreateAsync(newUser, registerDto.Password ?? "");
-
-                if (createdUser.Succeeded)
-                {
-                    var roleResult = await _userManager.AddToRoleAsync(newUser, "User");
-                    if (roleResult.Succeeded)
-                    {
-                        return Ok(
-                            new AuthenResDto
-                            {
-                                UserName = newUser.UserName ?? "",
-                                Email = newUser.Email ?? "",
-                                Token = _tokenServices.CreateToken(newUser)
-                            }
-                        );
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
-                }
-                else
-                {
-                    return StatusCode(500, createdUser.Errors);
-                }
+                    UserName = res.UserName ?? "",
+                    Email = res.Email ?? "",
+                    Token = _tokenServices.CreateToken(res)
+                });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return StatusCode(500, e);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -81,24 +55,22 @@ namespace backend.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username); 
-            if (user == null)
+            try
             {
-                return Unauthorized("Invalid username!");
+                var res = await _accountServices.LoginUser(loginDto);
+                return Ok(
+                    new AuthenResDto
+                    {
+                        UserName = res.UserName ?? "",
+                        Email = res.Email ?? "",
+                        Token = _tokenServices.CreateToken(res)
+                    }
+                );
             }
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-            if (!result.Succeeded) return Unauthorized("Username not found and/or password incorrect");
-
-            return Ok(
-                new AuthenResDto
-                {
-                    UserName = user.UserName ?? "",
-                    Email = user.Email ?? "",
-                    Token = _tokenServices.CreateToken(user)
-                }
-            );
+            catch (Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
         }
 
         [HttpGet("{username}")]
@@ -107,7 +79,7 @@ namespace backend.Controllers
             var user = await _accountServices.GetUserByUsernameAsync(username);
             if (user == null)
             {
-               return NotFound("User not found");
+                return NotFound("User not found");
             }
             return Ok(
                 new AuthenResDto

@@ -6,9 +6,7 @@ namespace backend.Dtos.Blogs
     {
 
         public string id { get; set; } = string.Empty;
-        [Required]
         public string? title { get; set; } 
-        [Required]
         public string? content { get; set; }     
 
     }

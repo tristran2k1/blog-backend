@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.Core;
+using backend.Helpers;
 using backend.Interfaces;
 using backend.Models;
 using Microsoft.Extensions.Primitives;
@@ -24,15 +25,16 @@ namespace api.Service
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"] ?? ""));
         }
 
-        public string CreateToken(Users user)
+        public string CreateToken(Users user, UserRole role)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-                new Claim(JwtRegisteredClaimNames.GivenName, user.UserName?? string.Empty)
+                new Claim(JwtRegisteredClaimNames.GivenName, user.UserName?? string.Empty),
+                new Claim(ClaimTypes.Role, role.ToString())
             };
 
-            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -81,6 +83,6 @@ namespace api.Service
             return jwtToken;
         }
 
-
+        
     }
 }

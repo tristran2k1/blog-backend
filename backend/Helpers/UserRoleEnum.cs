@@ -8,7 +8,7 @@
 
     static class UserRoleExtensions
     {
-        public static string GetRoleName(this UserRole role)
+        public static string ToString(this UserRole role)
         {
             switch (role)
             {

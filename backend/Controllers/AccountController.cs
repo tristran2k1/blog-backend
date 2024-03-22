@@ -1,8 +1,11 @@
 ﻿using api.Service;
 using backend.Dtos.Account;
+using backend.Helpers;
+using backend.Helpers.AuthorizationHelpers;
 using backend.Interfaces;
 using backend.Models;
 using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
@@ -39,7 +42,7 @@ namespace backend.Controllers
                 {
                     UserName = res.UserName ?? "",
                     Email = res.Email ?? "",
-                    Token = _tokenServices.CreateToken(res)
+                    Token = _tokenServices.CreateToken(res, registerDto.Role != null ? UserRole.ADMIN : UserRole.USER)
                 });
             }
             catch (Exception ex)
@@ -58,12 +61,13 @@ namespace backend.Controllers
             try
             {
                 var res = await _accountServices.LoginUser(loginDto);
+                var role = await _accountServices.GetRoleAsync(res);
                 return Ok(
                     new AuthenResDto
                     {
                         UserName = res.UserName ?? "",
                         Email = res.Email ?? "",
-                        Token = _tokenServices.CreateToken(res)
+                        Token = _tokenServices.CreateToken(res, role)
                     }
                 );
             }
@@ -74,6 +78,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("{username}")]
+        [Authorize(Policy = "AdministratorRequirement")]
         public async Task<IActionResult> GetUserByUsername(string username)
         {
             var user = await _accountServices.GetUserByUsernameAsync(username);
@@ -86,7 +91,6 @@ namespace backend.Controllers
                 {
                     UserName = user?.UserName ?? "",
                     Email = user?.Email ?? "",
-                    Token = _tokenServices.CreateToken(user)
                 }
             );
         }

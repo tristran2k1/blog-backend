@@ -1,5 +1,7 @@
 using api.Service;
 using backend.Data;
+using backend.Helpers;
+using backend.Helpers.ConfigurationExtensions;
 using backend.Interfaces;
 using backend.Models;
 using backend.Services;
@@ -62,7 +64,8 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddPolicies(); // define roles
+
 builder.Services.AddIdentity<Users, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
@@ -70,7 +73,7 @@ builder.Services.AddIdentity<Users, IdentityRole>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
-})
+}).AddDefaultTokenProviders()
 .AddEntityFrameworkStores<DataContext>();
 
 builder.Services.AddAuthentication(options =>
@@ -84,6 +87,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
+    options.Authority = builder.Configuration["JWT:Audience"];
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -98,6 +102,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<Users>, UserClaimsPrincipalFactory<Users, IdentityRole>>();
 builder.Services.AddScoped<IAccountRepository, AccountServices>();
 builder.Services.AddScoped<IBlogRepository, BlogServices>();
 builder.Services.AddScoped<IToken, TokenService>();
@@ -123,8 +128,8 @@ app.UseCors(x => x
 
 
 app.UseSerilogRequestLogging();
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

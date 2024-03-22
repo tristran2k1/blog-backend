@@ -25,6 +25,7 @@ namespace backend.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetBlog(int id)
         {
             Log.Information(Request.Headers.Authorization);

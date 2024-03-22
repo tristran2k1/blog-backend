@@ -41,7 +41,7 @@ namespace backend.Services
             var createdUser = await _userManager.CreateAsync(newUser, data.Password ?? "");
             if (createdUser.Succeeded)
             {
-                string role = string.IsNullOrEmpty(data.Role) ? UserRole.USER.GetRoleName() : UserRole.ADMIN.GetRoleName();
+                string role = string.IsNullOrEmpty(data.Role) ? UserRole.USER.ToString() : UserRole.ADMIN.ToString();
                 var roleResult = await _userManager.AddToRoleAsync(newUser, role);
                 if (roleResult.Succeeded)
                 {
